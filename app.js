@@ -26,6 +26,7 @@ const initializeDbAndServer = async () => {
   }
 };
 initializeDbAndServer();
+
 const hasPriorityandstatus = (requestQuery) => {
   return (
     requestQuery.priority !== undefined && requestQuery.status !== undefined
@@ -94,33 +95,99 @@ app.get("/todos/", async (request, response) => {
   const { search_q = " ", status, priority, category } = request.query;
   let getquery = " ";
   let data = null;
+
   switch (true) {
     case hasPriorityandstatus(request.query):
-      getquery = `select * from todo where todo like '%${search_q}%' and priority = '${priority}' and status = '${status}';`;
+      if (listis(priority)) {
+        if (listis(status)) {
+          getquery = `select * from todo where todo like '%${search_q}%' and priority = '${priority}' and status = '${status}';`;
+          data = await database.all(getquery);
+          response.send(data.map((eachis) => resultsinthis(eachis)));
+        } else {
+          response.status(400);
+          response.send("Invalid Todo Status");
+        }
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Priority");
+      }
       break;
+
     case hasCategoryandstatus(request.query):
-      getquery = `select * from todo where todo like '%${search_q}%' and category = '${category}' and status = '${status}';`;
+      if (listis(category)) {
+        if (listis(status)) {
+          getquery = `select * from todo where todo like '%${search_q}%' and category = '${category}' and status = '${status}';`;
+
+          data = await database.all(getquery);
+          response.send(data.map((eachis) => resultsinthis(eachis)));
+        } else {
+          response.status(400);
+          response.send("Invalid Todo Status");
+        }
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Category");
+      }
       break;
+
     case hasCategoryandPriority(request.query):
-      getquery = `select * from todo where todo like '%${search_q}%' and category = '${category}' and priority = '${priority}';`;
+      if (listis(category)) {
+        if (listis(priority)) {
+          getquery = `select * from todo where todo like '%${search_q}%' and category = '${category}' and priority = '${priority}';`;
+
+          data = await database.all(getquery);
+          response.send(data.map((eachis) => resultsinthis(eachis)));
+        } else {
+          response.status(400);
+          response.send("Invalid Todo Priority");
+        }
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Category");
+      }
       break;
+
     case hasCategory(request.query):
-      getquery = `select * from todo where todo like '%${search_q}%' and category = '${category}';`;
+      if (listis(category)) {
+        getquery = `select * from todo where todo like '%${search_q}%' and category = '${category}';`;
+        data = await database.all(getquery);
+        response.send(data.map((eachis) => resultsinthis(eachis)));
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Category");
+      }
       break;
+
     case hasPriority(request.query):
-      getquery = `select * from todo where todo like '%${search_q}%' and priority = '${priority}';`;
+      if (listis(priority)) {
+        getquery = `select * from todo where todo like '%${search_q}%' and priority = '${priority}';`;
+
+        data = await database.all(getquery);
+        response.send(data.map((eachis) => resultsinthis(eachis)));
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Priority");
+      }
       break;
+
     case hasStatus(request.query):
-      getquery = `select * from todo where todo like '%${search_q}%' and status = '${status}';`;
+      if (listis(status)) {
+        getquery = `select * from todo where todo like '%${search_q}%' and status = '${status}';`;
+
+        data = await database.all(getquery);
+        response.send(data.map((eachis) => resultsinthis(eachis)));
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Status");
+      }
       break;
 
     default:
       getquery = `select * from todo where todo like '%${search_q}%';`;
+      data = await database.all(getquery);
+      response.send(data.map((eachis) => resultsinthis(eachis)));
       break;
   }
-  data = await database.all(getquery);
-  //response.send(data);
-  response.send(data.map((eachis) => resultsinthis(eachis)));
 });
 
 app.get("/todos/:todoId/", async (request, response) => {
@@ -134,10 +201,10 @@ app.get("/todos/:todoId/", async (request, response) => {
 app.get("/agenda/", async (request, response) => {
   const { date } = request.query;
   let newdateis = new Date(date);
-  console.log(newdateis);
+  //console.log(newdateis);
   if (checkdatevalid(newdateis)) {
     const dateformat = checkdateformat(newdateis);
-    console.log(dateformat);
+    //console.log(dateformat);
     const datedataquery = `
     select * from todo where due_date = '${dateformat}';`;
     const datawithdate = await database.all(datedataquery);
@@ -195,7 +262,7 @@ app.put("/todos/:todoId/", async (request, response) => {
     case requestBody.category !== undefined:
       updateditem = "Category";
       break;
-    case requestBody.due_date !== undefined:
+    case requestBody.dueDate !== undefined:
       updateditem = "Due Date";
       break;
   }
@@ -245,3 +312,5 @@ app.delete("/todos/:todoId/", async (request, response) => {
   await database.run(deletequery);
   response.send("Todo Deleted");
 });
+
+module.exports = app;
