@@ -1,0 +1,22 @@
+GET http://localhost:3000/todos/?status=TO%20DO
+###
+
+GET http://localhost:3000/todos/2/
+###
+
+GET http://localhost:3000/agenda?date=2020/9/221/
+###
+
+
+POST http://localhost:3000/todos/
+Content-Type: application/json
+
+{
+  "id": 7,
+  "todo": "saibabu event theme",
+  "priority": "HIGH",
+  "status": "DONE",
+  "category": "HOME",
+  "dueDate": "1996-08-04"
+}
+###
