@@ -1,4 +1,4 @@
-GET http://localhost:3000/todos/?status=TO%20DO
+GET http://localhost:3000/todos/
 ###
 
 GET http://localhost:3000/todos/2/
@@ -12,11 +12,22 @@ POST http://localhost:3000/todos/
 Content-Type: application/json
 
 {
-  "id": 7,
-  "todo": "saibabu event theme",
+  "id": 1,
+  "todo": "ram event theme",
   "priority": "HIGH",
-  "status": "DONE",
+  "status": "TO DO",
   "category": "HOME",
   "dueDate": "1996-08-04"
 }
+###
+
+PUT http://localhost:3000/todos/7/
+Content-Type: application/json
+
+{
+    "status":"saibabu surampudi"
+}
+###
+
+DELETE http://localhost:3000/todos/6/
 ###

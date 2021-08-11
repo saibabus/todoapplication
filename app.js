@@ -177,3 +177,71 @@ app.post("/todos/", async (request, response) => {
     response.send("Invalid Todo Priority");
   }
 });
+
+app.put("/todos/:todoId/", async (request, response) => {
+  const { todoId } = request.params;
+  const requestBody = request.body;
+  let updateditem = " ";
+  switch (true) {
+    case requestBody.status !== undefined:
+      updateditem = "Status";
+      break;
+    case requestBody.priority !== undefined:
+      updateditem = "Priority";
+      break;
+    case requestBody.todo !== undefined:
+      updateditem = "Todo";
+      break;
+    case requestBody.category !== undefined:
+      updateditem = "Category";
+      break;
+    case requestBody.due_date !== undefined:
+      updateditem = "Due Date";
+      break;
+  }
+  const previousvaluesquery = `select * from todo where id = ${todoId};`;
+  const previousvalue = await database.get(previousvaluesquery);
+
+  const {
+    todo = previousvalue.todo,
+    priority = previousvalue.priority,
+    status = previousvalue.status,
+    category = previousvalue.category,
+    dueDate = previousvalue.due_date,
+  } = request.body;
+
+  if (listis(`${priority}`)) {
+    if (listis(`${status}`)) {
+      if (listis(`${category}`)) {
+        let postdate = new Date(`${dueDate}`);
+        if (checkdatevalid(postdate)) {
+          let postdateis = checkdateformat(postdate);
+          const updatedquery = `update todo set todo = '${todo}',status ='${status}',
+            category = '${category}', priority ='${priority}',due_date ='${dueDate}' where id = ${todoId};`;
+          await database.run(updatedquery);
+          response.send(`${updateditem} Updated`);
+        } else {
+          response.status(400);
+          response.send("Invalid Due Date");
+        }
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Category");
+      }
+    } else {
+      response.status(400);
+      response.send("Invalid Todo Status");
+    }
+  } else {
+    response.status(400);
+    response.send("Invalid Todo Priority");
+  }
+});
+
+app.delete("/todos/:todoId/", async (request, response) => {
+  const { todoId } = request.params;
+  const deletequery = `delete from todo where id = ${todoId};`;
+
+  await database.run(deletequery);
+  response.send("Todo Deleted");
+});
